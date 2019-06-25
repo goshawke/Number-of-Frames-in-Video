@@ -1,0 +1,58 @@
+import cv2
+import os
+import skvideo.io
+ 
+def extractFrames(pathIn, pathOut, frameFreq, numVid): 
+   # os.mkdir(pathOut)
+ 
+    cap = cv2.VideoCapture(pathIn)
+    count = 0
+ 
+    while (cap.isOpened()):
+ 
+        # Capture frame-by-frame
+        ret, frame = cap.read()
+        
+        
+        if(ret == True):
+            if(count % frameFreq == 0):
+              frame = frame[7:234,46 :273] 
+              print('Read %d frame: ' % count, ret)
+              cv2.imwrite(os.path.join(pathOut, "frame{:d}.{:d}.jpg".format(numVid, count)), frame)  # save frame as JPEG file
+          # if uncommented, this prints the frames to the screen
+          #    cv2.imshow('Frame', frame)
+            # Press Q on keyboard to  exit
+          #    if cv2.waitKey(25) & 0xFF == ord('q'):
+          #      break
+           
+            count += 1
+        elif(ret == False):
+            break
+        
+    # When everything done, release the capture
+    cap.release()
+#    cv2.destroyAllWindows()
+
+directory = 'C://Users/gosha/Downloads/UCF101/UCF-101'
+count = 0
+
+for folder in os.listdir(directory):  
+    print(folder)
+    newdirectory = 'C://Users/gosha/Downloads/UCF101/UCF-101/' + str(folder)
+    os.mkdir(newdirectory + '/' + str(folder) + 'Frames2')
+    for file in os.listdir(newdirectory): 
+        
+        filename = os.fsdecode(file)
+        print(filename)
+        if(filename.endswith('.avi')):
+            metadata = skvideo.io.ffprobe(newdirectory + '/' + filename)
+
+            numFrames = metadata["video"]['@nb_frames']
+            print(numFrames)
+            saveThisFrame = int(int(numFrames) / 20)
+            print(saveThisFrame)
+
+            extractFrames(newdirectory + '/' + filename, newdirectory + '/' + folder + 'Frames2', saveThisFrame, count)
+        count += 1       
+
+        
